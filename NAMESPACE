@@ -1,0 +1,5 @@
+export(read.cntrl, init.cntrl)
+export(jags.run, jags.env, jags.cntrl, jags.file, jags.prep)
+
+exportPattern("^[[:alpha:]]+")
+exportPattern("^[^\\.]")
