@@ -8,4 +8,3 @@ Maintainer: Krzysztof Sakrejda <sakrejda@cns.umass.edu>
 Description: uciekaj (run!) provides a conveinence layer over Martyn Plummer's rjags package for running BUGS models.
 Depends: rjags, yaml, optparse, reshape, coda
 License: GPL-3
-
