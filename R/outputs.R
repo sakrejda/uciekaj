@@ -108,6 +108,23 @@ mcarray.list.2.matrix <- function(x) {
 	attribs <- lapply(X=matrices, FUN=function(x) {
 		at <- attr(x=x, which='id')
 	})
+	all_attrib_noms <- unique(unlist(lapply(attribs,names)))
+	attribs <- lapply(attribs, function(attrib) {
+		for ( nom in all_attrib_noms ) {
+			if (!(nom %in% names(attrib))) {
+				attrib[[nom]] <- 1 #1
+				out_dim <- attr(attrib,'out.attrs')[['dim']]  #2
+				out_dim <- c(out_dim,1)
+				names(out_dim)[length(out_dim)] <- nom
+				attr(attrib,'out.attrs')[['dim']] <- out_dim
+				out_names <- attr(attrib,'out.attrs')[['dimnames']] #3
+				out_names <- c(out_names, paste0(nom,"=1"))
+				names(out_names)[length(out_names)] <- nom
+				attr(attrib,'out.attrs')[['dimnames']] <- out_names
+			}
+		}
+		return(attrib)
+	})
 	attribs <- do.call(what=rbind, args=attribs)
 	attribs[['parameter']] <- noms
 	rownames(attribs) <- 1:nrow(attribs)
