@@ -1,3 +1,75 @@
+jags_run <- function(
+	model = NULL, data = NULL, inits = NULL, variable_names = NULL,
+	n_adapt = 500, n_chains = 1, n_samples = 100, thin = 1,
+	output_prefix = NULL, job_name = NULL
+) {
+	if (!is.null(model) && (
+				is.character(model) || 
+				("textConnection" %in% class(model)))
+	) {
+	  adapt_time <- system.time(expr = {
+  	 	 if (is.null(inits)) {
+				mod <- jags.model(
+					file = model, data = data,
+					n.chains = n_chains, n.adapt = n_adapt)
+			} else {
+				mod <- jags.model(
+					file = model, data = data, inits = inits,
+					n.chains = n_chains, n.adapt = n_adapt)
+			}
+		})
+	} else if (!is.null(model) && !is.character(model)) {
+		mod <- model
+		adapt_time <- system.time(expr={TRUE})
+	} else {
+		stop("Provide a model.")
+	}
+	if (is.null(output_prefix)) {
+		output_prefix <- tempdir()
+	}
+	if (!file.exists(output_prefix)) {
+		dir.create(path=output_prefix,recursive=TRUE)
+	}
+	if (is.null(job_name)) {
+		job_name <- "JAGS"
+	}
+
+	sample_time <- system.time( expr = {
+		for ( i in 1:n_samples ) {
+			samples <- jags.samples(
+				model = mod, variable.names = variable_names,
+				n.iter = thin, thin = thin,
+				progress.bar = 'text'
+			)
+			out_file <- tempfile(
+				pattern=paste0("samples","-",job_name,"-",Sys.time(),"-"),
+				tmpdir=output_prefix,
+				fileext=".rds"
+			)
+			saveRDS(object=samples, file=out_file)
+		}
+	})
+  timing <- list( adapt = adapt_time, sample = sample_time )
+  out <- list(
+      model = mod,
+      timing = timing
+  )
+	return(out)
+}
+
+jags_bind <- function(path=NULL, pattern=NULL) {
+	files <- dir(path=path, pattern=pattern, full.names=TRUE)
+	files <- files[grepl('\\.rds',files)]
+	samples <- list()
+	for ( i in 1:length(files)) {
+		samples[[i]] <- readRDS(file=files[i])
+	}
+	bound_samples <- do.call(what=mapply, args=c(list(FUN=abind), samples))	
+	return(bound_samples)
+}
+
+
+
 jags.run <- function(
     file = '',
     data = NULL,
