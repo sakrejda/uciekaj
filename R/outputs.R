@@ -17,6 +17,12 @@ parse_dim <- function(s) {
 	return(o)
 }
 
+merge_samples <- function(sample_list) {
+	o <- do.call(what=mapply, args=c(list(abind), sample_list))
+	o <- lapply(o, function(x) {class(x) <- 'mcarray'; return(x)})
+	o <- lapply(o, function(x) {dimnames(x) <- NULL; return(x)})
+}
+
 as.matrix.mcarray <- function(x, use.attr=FALSE, ...) {
 	d <- parse_dim(x)
 	nr <- nrow(d[['index_range']])
