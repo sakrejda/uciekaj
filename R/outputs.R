@@ -23,6 +23,29 @@ merge_samples <- function(sample_list) {
 	o <- lapply(o, function(x) {dimnames(x) <- NULL; return(x)})
 }
 
+as_jags_init <- function(estimates) {
+  dimension_counts <- aggregate(formula=j ~ parameter, data=estimates, FUN=length)
+  
+  scalars <- dimension_counts[['parameter']][dimension_counts[['j']] == 1]
+  scalar_estimates <- estimates[estimates[['parameter']] %in% scalars,]
+  scalar_var_noms <- scalar_estimates[['parameter']]
+  scalar_var_values <- list(scalar_estimates[['50%']])
+  names(scalar_var_values) <- scalar_var_noms
+
+  vectors <- unique(dimension_counts[['parameter']][dimension_counts[['j']] > 1])
+  vector_var_values <- list()
+  for ( i in length(vectors) ) {
+    vector_name <- vectors[i]
+    vector_var_values[[vector_name]] <- estimates[
+      estimates[['parameter']] == vector_names,'50%']
+  }
+
+  init_values <- c(scalar_var_values, vector_var_values)
+
+  return(init_values)
+}
+  
+
 as.matrix.mcarray <- function(x, use.attr=FALSE, ...) {
 	d <- parse_dim(x)
 	nr <- nrow(d[['index_range']])
