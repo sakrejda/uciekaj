@@ -17,6 +17,12 @@ parse_dim <- function(s) {
 	return(o)
 }
 
+read_samples <- function(path, pattern) {
+	sample_files <- dir(path=path, pattern=pattern, full.names=TRUE)
+	o <- lapply(sample_files,readRDS)
+	return(o)
+}
+
 merge_samples <- function(sample_list) {
 	o <- do.call(what=mapply, args=c(list(abind), sample_list))
 	o <- lapply(o, function(x) {class(x) <- 'mcarray'; return(x)})
