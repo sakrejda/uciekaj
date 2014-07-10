@@ -23,8 +23,13 @@ read_samples <- function(path, pattern) {
 	return(o)
 }
 
-merge_samples <- function(sample_list) {
-	o <- do.call(what=mapply, args=c(list(abind), sample_list))
+merge_samples <- function(sample_list, along='chain') {
+	f <- function(...) abind(..., along=length(dim(list(...)[[1]]))-1)
+	if (along == 'chain') {
+		o <- do.call(what=mapply, args=c(list(abind), sample_list))
+	} else if (along == 'iteration') {
+		o <- do.call(what=mapply, args=c(list(f    ), sample_list))
+	} else { stop("Along must be between 0 and D.") }
 	o <- lapply(o, function(x) {class(x) <- 'mcarray'; return(x)})
 	o <- lapply(o, function(x) {dimnames(x) <- NULL; return(x)})
 }
