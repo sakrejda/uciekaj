@@ -8,8 +8,8 @@ plot_sample_trace <- function(sample_matrix, type=geom_line()) {
 	max_levels <- names(n_levels)[n_levels == max(n_levels)][1]
 	other_levels <- names(n_levels)[names(n_levels) != max_levels]
 	pl <- pl + facet_grid(
-		facets = paste0(max_levels, "~", paste(other_levels, collapse='+'),
-		scales='free_y')
+		facets = paste0(max_levels, "~", paste(other_levels, collapse='+')),
+		scales='free_y'
 	)
 	return(pl)
 }
