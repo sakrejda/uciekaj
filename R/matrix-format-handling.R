@@ -42,8 +42,8 @@ split_samples <- function(sample_matrix, sample_summary, mask_list) {
   for ( i in seq_along(mask_list)) {
     nom <- names(mask_list)[i]
     o[[nom]] <- list(
-      matrix = sample_matrix[mask_list[[i]],],
-      summary = sample_summary[mask_list[[i]],]
+      matrix = sample_matrix[mask_list[[i]],, drop=FALSE],
+      summary = sample_summary[mask_list[[i]],, drop=FALSE]
     )
     attr(o[[nom]][['matrix']],'id') <- attr(sample_matrix,'id')[mask_list[[i]],,drop=FALSE]
   }
