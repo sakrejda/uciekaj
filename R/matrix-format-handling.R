@@ -52,6 +52,7 @@ split_samples <- function(sample_matrix, sample_summary, mask_list) {
 
 melt_sample_matrix <- function(sample_matrix) {
   parameter_info <- attr(sample_matrix, 'id')
+	rownames(parameter_info) <- NULL
   wide_format <- cbind(parameter_info,as.data.frame(sample_matrix))
   sample_melt <- melt(data=wide_format, id.vars=c('parameter','j','k','chain'))
   sample_melt[['variable']] <- as.numeric(as.character(sample_melt[['variable']]))
