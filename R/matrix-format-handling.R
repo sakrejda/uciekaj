@@ -45,15 +45,21 @@ split_samples <- function(sample_matrix, sample_summary, mask_list) {
       matrix = sample_matrix[mask_list[[i]],],
       summary = sample_summary[mask_list[[i]],]
     )
-    attr(o[[nom]][['matrix']],'id') <- attr(sample_matrix,'id')[mask_list[[i]],]
+    attr(o[[nom]][['matrix']],'id') <- attr(sample_matrix,'id')[mask_list[[i]],,drop=FALSE]
   }
   return(o)
 }
 
-melt_sample_matrix <- function(sample_matrix) {
+melt_sample_matrix <- function(sample_matrix) {   ### RETHINK THIS, IT WAS CLOSE BEFORE!!!
+	if (!is.matrix(sample_matrix) || length(dim(sample_matrix)) < 2) {
+		stop("Problem with 'sample_matrix' argument, not matrtix.")
+	}
   parameter_info <- attr(sample_matrix, 'id')
+	if (is.null(parameter_info) || !is.data.frame(parameter_info) ||
+			nrow(parameter_info) != nrow(sample_matrix)
+	) { stop("Problem with 'sample_matrix' attribute 'id'.") }
 	rownames(parameter_info) <- NULL
-  wide_format <- cbind(parameter_info,as.data.frame(as.numeric(sample_matrix)))
+  wide_format <- cbind(parameter_info,as.data.frame(sample_matrix))
   sample_melt <- melt(data=wide_format, id.vars=c('parameter','j','k','chain'))
   sample_melt[['variable']] <- as.numeric(as.character(sample_melt[['variable']]))
   names(sample_melt)[names(sample_melt) == 'variable'] <- 'iteration'
