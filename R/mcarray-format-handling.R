@@ -117,7 +117,7 @@ mcarray.list.2.matrix <- function(x) {
 mcarray.list.2.estimates <- function(x) {
 	mat <- mcarray.list.2.matrix(x)
 	ids <- attr(x=mat, which='id')
-	autoc <- sapply(apply(mat,1,acf, plot=FALSE, lag.max=1), function(x) { x$acf[2] })
+	autoc <- sapply(apply(mat,1,acf, plot=FALSE, lag.max=1, na.action=na.rm), function(x) { x$acf[2] })
 	es <- apply(mat,1,function(x) {effectiveSize(as.mcmc(x))})
 	est <- t(apply(mat, 1, quantile, probs=c(0.025, 0.5, 0.975)))
 	estimates <- cbind(ids, data.frame(acf=autoc, sample_size=es), est)
